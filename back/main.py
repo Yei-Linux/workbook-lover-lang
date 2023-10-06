@@ -1,14 +1,19 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.background import BackgroundTask
+from dotenv import dotenv_values
+from pymongo import MongoClient
 
 import uvicorn
 import os
 
 from helpers.file import unique_id, save_upload_file, remove_file
-from services.generate_audio import handler_genera_audio
+from helpers.generate_audio import handler_genera_audio
+from models.AudioBook import AudioBook
+from services.audiobook import save_audiobook
+from proxy.aws import upload_file_s3
 
+config = dotenv_values(".env")
 app = FastAPI()
 
 origins = ["*"]
@@ -20,20 +25,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+def startup_db_client():
+    app.mongodb_client = MongoClient(config["DB_ATLAS_URI"])
+    app.database = app.mongodb_client[config["DB_NAME"]]
+    print("Database Connected Succesfully")
+
+@app.on_event("shutdown")
+def shutdown_db_client():
+    app.mongodb_client.close()
+
 @app.post("/api/generate-audio")
 async def generate_audio(file: UploadFile = File(...)):
     id = unique_id()
     file_name_doc = f"{id}.pdf"
     file_name_audio = f"{id}.mp3"
 
+    db = app.database
+
     destination_doc = os.path.join('files',file_name_doc)
     destination_audio = os.path.join('files',file_name_audio)
 
     save_upload_file(file,destination_doc)
-    await handler_genera_audio(destination_doc,destination_audio)
+    audio_book_model = await handler_genera_audio(destination_doc,destination_audio)
     remove_file(destination_doc)
+
+    s3_url = upload_file_s3(destination_audio)
+    if (s3_url == None):
+        return {"data": {}, "error": True}
     
-    return FileResponse(destination_audio,background=BackgroundTask(remove_file, destination_audio))
+    audio_book_model["audio_url"] = s3_url
+    audio_book = save_audiobook(audio_book_model,db)
+    remove_file(destination_audio)
+    
+    return { "data" : audio_book, "error": False }
 
 if __name__ == '__main__':
     uvicorn.run("main:app",reload=True)
