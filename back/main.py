@@ -47,7 +47,7 @@ async def generate_audio(file: UploadFile = File(...)):
     destination_audio = os.path.join('files',file_name_audio)
 
     save_upload_file(file,destination_doc)
-    audio_book_model = await handler_genera_audio(destination_doc,destination_audio)
+    audio_book_model = await handler_genera_audio(destination_doc,destination_audio,source_filename=file.filename.replace(".pdf", ""))
     remove_file(destination_doc)
 
     s3_url = upload_file_s3(destination_audio)
