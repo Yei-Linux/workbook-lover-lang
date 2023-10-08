@@ -5,6 +5,7 @@ import { AddPdfModal } from './AddPdfModal/AddPdfModal';
 import { useFetchCollection } from './hooks/useFetchCollection';
 import { Button, Pagination, Spinner } from '@nextui-org/react';
 import { Fragment } from 'react';
+import { useUpdateAudiobooksCollectionUI } from './hooks/useUpdateAudiobooksCollectionUI';
 
 export const AudioCollectionList = () => {
   const {
@@ -16,6 +17,7 @@ export const AudioCollectionList = () => {
     isLoading,
     totalPages,
   } = useFetchCollection();
+  useUpdateAudiobooksCollectionUI({ udpatePage, udpateSearch });
 
   return (
     <div className="flex flex-col gap-4">

@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 export const useFetchCollection = () => {
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalPages, setTotalPages] = useState<number | undefined>(undefined);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
@@ -33,10 +33,12 @@ export const useFetchCollection = () => {
 
   useEffect(() => {
     const totalPag = audioCollectionList?.metadata?.total_pages;
-    if (!totalPag) return;
-    if (!!totalPages) return;
     setTotalPages(totalPag);
   }, [audioCollectionList?.metadata?.total_pages]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   return {
     udpatePage,

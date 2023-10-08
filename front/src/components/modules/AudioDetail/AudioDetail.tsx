@@ -5,7 +5,6 @@ import { AudioPlayer } from './AudioPlayer';
 import { useFetchAudio } from './hooks/useFetchAudio';
 import { FC, Fragment } from 'react';
 import { PLACEHOLDER_WITHOUT_TITLE } from '@/mocks/audiobooks.mock';
-import { useRouter } from 'next/router';
 
 export interface IAudioDetail {
   id: string;
@@ -16,7 +15,7 @@ export const AudioDetail: FC<IAudioDetail> = ({ id }) => {
 
   return (
     <div className="w-full h-full flex flex-col gap-3 justify-between">
-      {audiobook && (
+      {audiobook && audiobook.audio_url && (
         <Fragment>
           <AudioInfo
             title={
@@ -24,7 +23,10 @@ export const AudioDetail: FC<IAudioDetail> = ({ id }) => {
             }
             transcription={audiobook.transcription}
           />
-          <AudioPlayer />
+          <AudioPlayer
+            audioSrc={audiobook.audio_url}
+            audioDuration={audiobook.duration}
+          />
         </Fragment>
       )}
     </div>

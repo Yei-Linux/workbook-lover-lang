@@ -1,6 +1,6 @@
 import { Card, CardBody, Button, Image } from '@nextui-org/react';
 import { FC, useMemo } from 'react';
-import { formatSecondsDuration } from './helpers';
+import { formatSecondsDuration } from './utils';
 import Link from 'next/link';
 
 export interface IAudioCard {
