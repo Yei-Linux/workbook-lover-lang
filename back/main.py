@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.background import BackgroundTask
 from dotenv import dotenv_values
 from pymongo import MongoClient
+from typing import Union
 
 import uvicorn
 import os
@@ -10,7 +11,7 @@ import os
 from helpers.file import unique_id, save_upload_file, remove_file
 from helpers.generate_audio import handler_genera_audio
 from models.AudioBook import AudioBook
-from services.audiobook import save_audiobook
+from services.audiobook import save_audiobook, find_audiobooks, find_audiobook_by_id
 from proxy.aws import upload_file_s3
 
 config = dotenv_values(".env")
@@ -35,8 +36,20 @@ def startup_db_client():
 def shutdown_db_client():
     app.mongodb_client.close()
 
-@app.post("/api/generate-audio")
-async def generate_audio(file: UploadFile = File(...)):
+@app.get("/api/audiobooks/{id}")
+async def get_aubiobook_by_id(id):
+    db = app.database
+    audiobook = find_audiobook_by_id(id,db)
+    return {"data": audiobook}
+
+@app.get("/api/audiobooks")
+async def get_audiobooks(search: str = "", page: int = 1, size: int = 10):
+    db = app.database
+    audiobooks, metadata = find_audiobooks(search,db, page-1,  size)
+    return {"data": audiobooks, "metadata": metadata}
+
+@app.post("/api/audiobooks")
+async def generate_audiobook(file: UploadFile = File(...)):
     id = unique_id()
     file_name_doc = f"{id}.pdf"
     file_name_audio = f"{id}.mp3"

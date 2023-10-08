@@ -1,5 +1,7 @@
 import { IAudioCard } from '@/components/modules/AudioCollectionList/AudioCard';
 
+export const PLACEHOLDER_WITHOUT_TITLE = 'AudioBook Without Title';
+export const PAGE_SIZE_AUDIOBOOKS = 3;
 export const audioBooks: Array<IAudioCard> = [
   {
     id: '1',

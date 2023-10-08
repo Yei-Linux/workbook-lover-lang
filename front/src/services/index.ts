@@ -1,1 +1,1 @@
-export * from './generate-audio';
+export * from './workbooks';
