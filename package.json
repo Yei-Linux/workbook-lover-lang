@@ -1,0 +1,23 @@
+{
+  "name": "workbook-lover",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "aws:deploy-ecr": "sh ./scripts/deploy-images-to-ecr.sh",
+    "front:dev": "cd front && npm run dev",
+    "front:build": "cd front && npm run build",
+    "back:reqs": "cd back && pigar generate",
+    "docker:build-back": "cd back && docker buildx build --platform linux/amd64,linux/arm64 -t ms-workbook-lover ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yei-Linux/workbook-lover-lang.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yei-Linux/workbook-lover-lang/issues"
+  },
+  "homepage": "https://github.com/Yei-Linux/workbook-lover-lang#readme"
+}

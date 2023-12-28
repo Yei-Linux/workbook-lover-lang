@@ -1,1 +1,1 @@
-export const BASE_PATH = 'http://localhost:8000/api';
+export const BASE_PATH = process.env['NEXT_PUBLIC_MS_WORKBOOK_LOVER'] + '/api';
