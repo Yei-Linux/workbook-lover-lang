@@ -74,4 +74,7 @@ async def generate_audiobook(file: UploadFile = File(...)):
     return { "data" : audio_book, "error": False }
 
 if __name__ == '__main__':
-    uvicorn.run("main:app",reload=True)
+    if not os.path.exists('files'):
+        os.makedirs('files')
+
+    uvicorn.run("main:app",reload=False, port= int(config['MS_PORT']), host= "0.0.0.0")

@@ -1,17 +1,24 @@
-from gtts import gTTS
-from TTS.api import TTS
 from pydub import AudioSegment
+import boto3
+from dotenv import dotenv_values
 
 import PyPDF2
 
-def gtts_handler(pdf_content: str,language: str,destination: str):
-    myobj = gTTS(text=pdf_content, lang=language, slow=False)
-    myobj.save(destination)
-    return
+def tts_polly_handler(pdf_content: str,language: str, destination: str): 
+    secret = dotenv_values(".env")["AWS_ACCESS_SECRET"]
+    key = dotenv_values(".env")["AWS_ACCESS_KEY"]
+    region = dotenv_values(".env")["AWS_REGION"]
 
-def tts_handler(pdf_content: str,language: str, destination: str): 
-    tts = TTS(model_name="tts_models/en/ljspeech/vits", progress_bar=True, gpu=False)
-    tts.tts_to_file(pdf_content, file_path=destination)
+    free_version = pdf_content[0:1500]
+
+    polly_client = boto3.session.Session( aws_access_key_id= key, aws_secret_access_key= secret, region_name = region).client('polly')
+    response = polly_client.synthesize_speech(VoiceId='Joanna',
+                OutputFormat='mp3', 
+                Text = free_version)
+
+    file = open(destination, 'wb')
+    file.write(response['AudioStream'].read())
+    file.close()
 
 def read_pdf(file_name: str,source_filename: str):
     file = open(file_name,'rb')
@@ -41,7 +48,7 @@ async def handler_genera_audio(file_name, destination, source_filename):
     retries = 3
     for i in range(retries):
         try:
-            tts_handler(pdf_content,language, destination)
+            tts_polly_handler(pdf_content,language, destination)
         except KeyError as e:
             if i < retries - 1:
                 print(f"Retry number {retries}")
