@@ -1,1 +1,1 @@
-export * from './Audioinfo';
+export * from './AudioInfo';
