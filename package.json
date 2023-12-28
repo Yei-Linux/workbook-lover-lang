@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "aws:deploy-ecr": "sh ./scripts/deploy-images-to-ecr.sh",
+    "aws:create-ec2-instance": "sh ./scripts/create-ec2-instance.sh",
+    "aws:create-key": "sh ./scripts/create-key-pair.sh",
     "front:dev": "cd front && npm run dev",
     "front:build": "cd front && npm run build",
     "back:reqs": "cd back && pigar generate",
